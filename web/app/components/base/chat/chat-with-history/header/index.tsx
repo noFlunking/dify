@@ -23,7 +23,7 @@ const Header = () => {
     appData,
     currentConversationId,
     currentConversationItem,
-    inputsForms,
+    shouldRenderInputsForms,
     pinnedConversationList,
     handlePinConversation,
     handleUnpinConversation,
@@ -134,7 +134,7 @@ const Header = () => {
               </ActionButton>
             </Tooltip>
           )}
-          {currentConversationId && inputsForms.length > 0 && (
+          {currentConversationId && shouldRenderInputsForms.length > 0 && (
             <ViewFormDropdown />
           )}
         </div>

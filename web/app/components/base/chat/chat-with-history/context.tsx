@@ -32,6 +32,7 @@ export type ChatWithHistoryContextValue = {
   newConversationInputsRef: RefObject<Record<string, any>>
   handleNewConversationInputsChange: (v: Record<string, any>) => void
   inputsForms: any[]
+  shouldRenderInputsForms: any[]
   handleNewConversation: () => void
   handleStartChat: (callback?: any) => void
   handleChangeConversation: (conversationId: string) => void
@@ -65,6 +66,7 @@ export const ChatWithHistoryContext = createContext<ChatWithHistoryContextValue>
   newConversationInputsRef: { current: {} },
   handleNewConversationInputsChange: () => {},
   inputsForms: [],
+  shouldRenderInputsForms: [],
   handleNewConversation: () => {},
   handleStartChat: () => {},
   handleChangeConversation: () => {},
