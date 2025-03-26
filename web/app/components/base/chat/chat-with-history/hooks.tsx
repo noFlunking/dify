@@ -7,7 +7,7 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import useSWR from 'swr'
-import { useLocalStorageState } from 'ahooks'
+import { useAsyncEffect, useLocalStorageState } from 'ahooks'
 import produce from 'immer'
 import type {
   Callback,
@@ -16,7 +16,7 @@ import type {
   Feedback,
 } from '../types'
 import { CONVERSATION_ID_INFO } from '../constants'
-import { buildChatItemTree } from '../utils'
+import { buildChatItemTree, getProcessedInputsFromUrlParams } from '../utils'
 import { addFileInfos, sortAgentSorts } from '../../../tools/utils'
 import { getProcessedFilesFromResponse } from '@/app/components/base/file-uploader/utils'
 import {
@@ -42,6 +42,7 @@ import { changeLanguage } from '@/i18n/i18next-config'
 import { useAppFavicon } from '@/hooks/use-app-favicon'
 import { InputVarType } from '@/app/components/workflow/types'
 import { TransferMethod } from '@/types/app'
+import { filter } from 'lodash-es'
 
 function getFormattedChatList(messages: any[]) {
   const newChatList: ChatItem[] = []
@@ -171,23 +172,34 @@ export const useChatWithHistory = (installedAppInfo?: InstalledApp) => {
     newConversationInputsRef.current = newInputs
     setNewConversationInputs(newInputs)
   }, [])
+
+  const [initInputs, setInitInputs] = useState<Record<string, any>>({})
+
   const inputsForms = useMemo(() => {
     return (appParams?.user_input_form || []).filter((item: any) => !item.external_data_tool).map((item: any) => {
       if (item.paragraph) {
+        let value = initInputs[item.paragraph.variable]
+        if (value && item.paragraph.max_length && value.length > item.paragraph.max_length)
+          value = value.slice(0, item.paragraph.max_length)
         return {
           ...item.paragraph,
+          default: value || item.default,
           type: 'paragraph',
         }
       }
       if (item.number) {
+        const convertedNumber = Number(initInputs[item.number.variable]) ?? undefined
         return {
           ...item.number,
+          default: convertedNumber || item.default,
           type: 'number',
         }
       }
       if (item.select) {
+        const isInputInOptions = item.select.options.includes(initInputs[item.select.variable])
         return {
           ...item.select,
+          default: (isInputInOptions ? initInputs[item.select.variable] : undefined) || item.default,
           type: 'select',
         }
       }
@@ -206,12 +218,26 @@ export const useChatWithHistory = (installedAppInfo?: InstalledApp) => {
         }
       }
 
+      let value = initInputs[item['text-input'].variable]
+      if (value && item['text-input'].max_length && value.length > item['text-input'].max_length)
+        value = value.slice(0, item['text-input'].max_length)
+
       return {
         ...item['text-input'],
+        default: value || item.default,
         type: 'text-input',
       }
     })
-  }, [appParams])
+  }, [initInputs, appParams])
+
+  // 应该渲染的表单是过滤隐藏字段后的表单
+  const shouldRenderInputsForms = useMemo(() => filter(inputsForms, form => !form.variable.startsWith('_')), [inputsForms])
+
+  useAsyncEffect(async () => {
+    // init inputs from url params
+    setInitInputs(await getProcessedInputsFromUrlParams())
+  }, [])
+
   useEffect(() => {
     const conversationInputs: Record<string, any> = {}
 
@@ -444,6 +470,7 @@ export const useChatWithHistory = (installedAppInfo?: InstalledApp) => {
     newConversationInputsRef,
     handleNewConversationInputsChange,
     inputsForms,
+    shouldRenderInputsForms,
     handleNewConversation,
     handleStartChat,
     handleChangeConversation,

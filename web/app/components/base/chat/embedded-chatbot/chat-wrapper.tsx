@@ -33,6 +33,7 @@ const ChatWrapper = () => {
     currentConversationId,
     currentConversationItem,
     inputsForms,
+    shouldRenderInputsForms,
     newConversationInputs,
     newConversationInputsRef,
     handleNewConversationCompleted,
@@ -163,7 +164,7 @@ const ChatWrapper = () => {
   const [collapsed, setCollapsed] = useState(!!currentConversationId)
 
   const chatNode = useMemo(() => {
-    if (!inputsForms.length)
+    if (!shouldRenderInputsForms.length)
       return null
     if (isMobile) {
       if (!currentConversationId)
@@ -173,7 +174,7 @@ const ChatWrapper = () => {
     else {
       return <InputsForm collapsed={collapsed} setCollapsed={setCollapsed} />
     }
-  }, [inputsForms.length, isMobile, currentConversationId, collapsed])
+  }, [shouldRenderInputsForms.length, isMobile, currentConversationId, collapsed])
 
   const welcome = useMemo(() => {
     const welcomeMessage = chatList.find(item => item.isOpeningStatement)
@@ -183,7 +184,7 @@ const ChatWrapper = () => {
       return null
     if (!welcomeMessage)
       return null
-    if (!collapsed && inputsForms.length > 0)
+    if (!collapsed && shouldRenderInputsForms.length > 0)
       return null
     if (welcomeMessage.suggestedQuestions && welcomeMessage.suggestedQuestions?.length > 0) {
       return (
@@ -218,7 +219,7 @@ const ChatWrapper = () => {
         </div>
       </div>
     )
-  }, [appData?.site.icon, appData?.site.icon_background, appData?.site.icon_type, appData?.site.icon_url, chatList, collapsed, currentConversationId, inputsForms.length, respondingState])
+  }, [appData?.site.icon, appData?.site.icon_background, appData?.site.icon_type, appData?.site.icon_url, chatList, collapsed, currentConversationId, shouldRenderInputsForms.length, respondingState])
 
   const answerIcon = isDify()
     ? <LogoAvatar className='relative shrink-0' />
