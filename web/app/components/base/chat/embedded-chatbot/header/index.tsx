@@ -32,7 +32,7 @@ const Header: FC<IHeaderProps> = ({
   const {
     appData,
     currentConversationId,
-    inputsForms,
+    shouldRenderInputsForms,
   } = useEmbeddedChatbotContext()
   if (!isMobile) {
     return (
@@ -66,7 +66,7 @@ const Header: FC<IHeaderProps> = ({
               </ActionButton>
             </Tooltip>
           )}
-          {currentConversationId && inputsForms.length > 0 && (
+          {currentConversationId && shouldRenderInputsForms.length > 0 && (
             <ViewFormDropdown />
           )}
         </div>
@@ -98,7 +98,7 @@ const Header: FC<IHeaderProps> = ({
             </ActionButton>
           </Tooltip>
         )}
-        {currentConversationId && inputsForms.length > 0 && (
+        {currentConversationId && shouldRenderInputsForms.length > 0 && (
           <ViewFormDropdown iconColor={theme?.colorPathOnHeader} />
         )}
       </div>

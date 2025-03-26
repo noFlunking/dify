@@ -15,7 +15,7 @@ const InputsFormContent = ({ showTip }: Props) => {
   const { t } = useTranslation()
   const {
     appParams,
-    inputsForms,
+    shouldRenderInputsForms,
     currentConversationId,
     currentConversationItem,
     newConversationInputs,
@@ -34,7 +34,7 @@ const InputsFormContent = ({ showTip }: Props) => {
 
   return (
     <div className='space-y-4'>
-      {inputsForms.map(form => (
+      {shouldRenderInputsForms.map(form => (
         <div key={form.variable} className='space-y-1'>
           <div className='flex h-6 items-center gap-1'>
             <div className='system-md-semibold text-text-secondary'>{form.label}</div>
